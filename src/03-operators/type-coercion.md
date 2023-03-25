@@ -114,3 +114,149 @@ Boolean(false)        // false
 All of the others is truthy values.
 
 ### Object coercion
+When it comes to objects, the engine will do 2 processes:
+1. Convert an object to primitive value
+2. Convert primitive value to final type
+
+And there is just still 3 types: numeric, boolean and string.
+
+The simplest cast is boolean conversion: any non-primitive value is always coercedto `true`, no matter if an object or an array is empty or not.
+
+Objects are converted to primitives via the internal [[ToPrimitive]] method, which is responsible for both numeric and string conversion.
+
+Here is a pseudo implementation of [[ToPrimitive]] method:
+
+[[ToPrimitive]] is passed with an input value and preferred type of conversion: Number or String. preferredType is optional.
+
+Both numeric and string conversion make use of two methods of the input object: valueOf and toString . Both methods are declared on Object.prototype and thus available for any derived types, such as Date, Array, etc.
+
+In general the algorithm is as follows:
+
+1. If input is already a primitive, do nothing and return it.
+2. Call `input.toString()`, if the result is primitive, return it.
+3. Call `input.valueOf()`, if the result is primitive, return it.
+4. If neither `input.toString()` nor `input.valueOf()` yields primitive, throw `TypeError`.
+
+Numeric conversion first calls `valueOf` (3) with a fallback to `toString` (2). String conversion does the opposite: `toString` (2) followed by `valueOf` (3).
+
+Most built-in types do not have `valueOf`, or have valueOf returning this object itself, so it’s ignored because it’s not a primitive. That’s why numeric and string conversion might work the same — both end up calling `toString()`.
+
+Different operators can trigger either numeric or string conversion with a help of preferredType parameter. But there are two exceptions: loose equality `==` and binary `+` operators trigger default conversion modes (preferredType is not specified, or equals to default). In this case, most built-in types assume numeric conversion as a default, except Date that does string conversion.
+
+Now, let's the fun begin
+
+#### Example 1
+```javascript
+true + false // 1
+```
+**Explanation**: `true` and `false` will be convert to numbers as 1 and 0, respectively.
+
+#### Example 2
+```javascript
+12 / "6" // 2
+```
+**Explanation**: `"6"` will be convert to number 6 and `12/6` is 2
+
+#### Example 3
+```javascript
+"number" + 15 + 3 // "number153"
+```
+**Explanation**: `"number" + 15` will make 15 is converted to string resulting as "number15" and the same goes for 3, resulting as `"number153"`
+
+#### Example 4
+```javascript
+15 + 3 + "number" // "18number"
+```
+**Explanation**: `15+3` is 18 and converted to string, concatenation with `"number"` and the result is `"18number"`
+
+#### Example 5
+```javascript
+[1] > null
+```
+**Explanation**: 
+```
+~ '1' > 0
+~ 1 > 0
+~ true
+```
+
+#### Example 6
+```javascript
+"foo" + + "bar" // "fooNaN"
+```
+
+**Explanation**: 
+The unary `+` has the higher precedence so `+ "bar"` will be converted to number first, but `"bar"` is not a valid number so it return `NaN`. On the second step, it is just a string conversion, as the result is `"fooNaN"`
+
+#### Example 7
+```javascript
+'true' == true // false
+```
+**Explanation**: `==` will trigger numeric conversion, as `'true'` will return `NaN` since it is not a valid number and `true` will be convert to 1. 
+```
+~ NaN == 1 
+~ false
+```
+
+#### Example 8
+```javascript
+'false' == false // false
+```
+**Explanation**:
+```
+~ 0 == NaN
+~ false
+```
+#### Example 9
+```javascript
+null == '' // false
+```
+**Explanation**: Remember the special rule in numeric conversion ?
+
+
+#### Example 10
+```javascript
+!!"false" == !!"true" // true
+```
+**Explanation**: `!!` convert both string to boolean `true`, because both is a valid string, resulting as `true == true` then convert to number `1 == 1`, as result is `true`
+
+#### Example 11
+```javascript
+['x'] == 'x' // true
+```
+**Explanation**: `==` operator triggers a numeric conversion for an array. Array’s `valueOf()` method returns the array itself, and is ignored because it’s not a primitive. Array’s toString() converts `['x']` to just `'x'` string.
+```
+~ 'x' == 'x'
+~ true
+```
+
+#### Example 12 
+```javascript
+[] + null + 1 // "null1"
+```
+**Explanation**: `+` operator triggers numeric conversion for `[]`. Array’s `valueOf()` method is ignored, because it returns array itself, which is non-primitive. Array’s `toString` returns an empty string.
+
+On the the second step expression `'' + null + 1` is evaluated.
+
+#### Example 13 
+```javascript
+[1,2,3] == [1,2,3] // false
+```
+**Explanation**: No coercion is needed because both operands have same type. Since == checks for object identity (and not for object equality) and the two arrays are two different instances, the result is false.
+
+#### Example 14 (Very interesting)
+```javascript
+{}+[]+{}+[1] // "0[object Object]1"
+```
+**Explanation**:
+
+#### Example 15
+```javascript
+!+[]+[]+![]  // "truefalse"
+```
+
+#### Example 16 
+```javascript
+0 || "0" && {}  // {}
+```
+**Explanation**: 
