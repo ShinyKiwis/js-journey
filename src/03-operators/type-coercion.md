@@ -249,14 +249,46 @@ On the the second step expression `'' + null + 1` is evaluated.
 {}+[]+{}+[1] // "0[object Object]1"
 ```
 **Explanation**:
+##### In browser:
+Since all operands are not primitive values, so `+` start with the leftmost one triggering the numeric conversion. Both `Object's` and `Array's` `valueOf` method returns the object itself, so it's ignored. `toString()` is used as a fallback.
+
+However the first `{}` is not consider as a object literal but instead a block statement, so it's ignored. The whole expresison becomes `+[]+{}+[1]`.
+
+```
+~ +[] + {} + [1]
+~ 0 + {} + [1]
+~ 0 + '[object Object]' + [1]
+~ 0 + '[object Object]' + '1'
+~ '0[object Object]1'
+```
+
+##### In Node:
+The fun part is try to run this in Node. Instead of trigger a numeric conversion, it triggers string conversion.
+```
+~ '[object Object]' + '' + '[object Object]' + '1'
+~ '[object Object][object Object]1'
+```
 
 #### Example 15
 ```javascript
 !+[]+[]+![]  // "truefalse"
+```
+**Explanation**: `+[]` will be convert to `0`, then `!` convert in operand to boolean which is false and `!false` is true. While `![]` will be false because `Boolean([])` is `true` and `!` convert it to `false`
+```
+~ true + '' + false
+~ 'truefalse'
 ```
 
 #### Example 16 
 ```javascript
 0 || "0" && {}  // {}
 ```
-**Explanation**: 
+**Explanation**: Logical `||` and `&&` operators coerce operands to boolean, but return original operands (not booleans). `0` is falsy, whereas `'0'` is truthy, because it’s a non-empty string. {} empty object is truthy as well.
+
+```
+~ (0 || "0") && {}
+~ false || true && true //internally
+~ "0" && {}
+~ true && true //internally
+~ {}
+```
