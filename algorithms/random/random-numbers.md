@@ -101,3 +101,17 @@ between 0 and 2. If you get a 2, which is outside the desired range, you ignore
 it and get another number.
 
 ### Getting Fairness from Biased Sources
+Even if a PRNG is unfair, there may be a way to generate fair numbers. For example, suppose you think a coin is unfair. You don't know the probabilities getting heads or tails but you suspect the probabilities are not 0.5. In that case, the following algorithm produces a fair coin flip:
+```
+Flip the biased coin twice.
+  If the result is {Heads, Tails}, return Heads.
+  If the result is {Tails, Heads}, return Tails.
+  If the result is something else, start over.
+
+```
+To see why this works, suppose the probability of the biased coin coming up
+heads is P, and the probability of its coming up tails is 1 – P. Then the probability
+of getting heads followed by tails is P × (1 – P). The probability of getting tails
+followed by heads is (1 – P) × P. The two probabilities are the same, so the prob-
+ability of the algorithm returning heads or tails is the same, and the result is fair.
+

@@ -6,6 +6,14 @@ This is my personal repo for review javascript before learning React and other f
 as well as preparing for an interview.
 The resources are structured into topics, however for some topics that worth noting will have its separate folder. In some folders, you will find answers and solutions for those to practice. Finally, all of these will be stored in folder `src`.
 
+One thing worth noticing that this personal repo is not for beginners but instead for someone who already have some experiences with other programming languages  and want to learn with me about JavaScript and its weirdness.
+
+```
+{} + [] + {} + [1]
+```
+
+The above expression return `0[object Object]1`, you will know why if you dig in MDN document or read my notes (everything is extracted from MDN anyway).
+
 Take time and learn with me, if there is any errors or misunderstanding, I will be happy to fix them as soon as possible.
 
 Algorithms implemented in JavaScript will also available at `algorithms`, and they will have its own folder.
