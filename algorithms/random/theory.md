@@ -86,3 +86,18 @@ Let's have a look at a small example, using same values from previous equation j
 
 In a real PRNG where the modulus M is very large, the problem is smaller, but it’s still present.
 
+A better approach is to convert the value produced by the PRNG into a fraction between 0 and 1 and then multiply that by the desired range, as in the
+following formula:
+
+<center>
+
+$result = Min + (number ÷ M) × (Max – Min)$
+
+</center>
+Another method of converting a pseudorandom value from one range to
+another is to simply ignore any results that fall outside the desired range. In
+the previous example, you would use the limited PRNG to generate a value
+between 0 and 2. If you get a 2, which is outside the desired range, you ignore
+it and get another number.
+
+### Getting Fairness from Biased Sources
