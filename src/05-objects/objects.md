@@ -44,4 +44,7 @@ const person = {
 person.greet()
 ```
 # What to do now ? 
-If you have reached this page, congrats. Now let's do a real project by making a game, tic-tac-toe.
+If you have reached this page, congrats. Now let's do a real project by making a game, **Pop Quiz**
+
+Warning: The content of the project is taken from FrontEnd Master website, I only store it here for educational purposes.
+If I am not allow to do this, I will take this down immediately without any further question.
